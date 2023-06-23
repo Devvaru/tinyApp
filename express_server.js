@@ -33,17 +33,20 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  const id = generateRandomString();
+  urlDatabase[id] = req.body.longURL; // save longURL from submissions and generate id, store in urlDatabase
+  console.log(urlDatabase)
+  res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
+});
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
 // displays current port in terminal to prevent confusion
