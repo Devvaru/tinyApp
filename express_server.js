@@ -41,6 +41,12 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
 });
 
+app.get("/u/:id", (req, res) => {
+  const paramsID = req.params.id;
+  const longURL = urlDatabase[paramsID];
+  res.redirect(longURL);
+});
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
