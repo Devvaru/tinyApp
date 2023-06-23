@@ -37,7 +37,7 @@ app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const id = generateRandomString();
   urlDatabase[id] = req.body.longURL; // save longURL from submissions and generate id, store in urlDatabase
-  console.log(urlDatabase)
+  console.log(urlDatabase);
   res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
 });
 
