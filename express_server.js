@@ -49,6 +49,14 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+// updates urls with button
+app.post("/urls/:id/edit", (req, res) => {
+  const shortURL = req.params.id;
+  const longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect("/urls");
+});
+
 // redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
 app.get("/u/:id", (req, res) => {
   const paramsID = req.params.id;
