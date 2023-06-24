@@ -41,18 +41,18 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
 });
 
+// redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
 app.get("/u/:id", (req, res) => {
   const paramsID = req.params.id;
   const longURL = urlDatabase[paramsID];
+  if (!longURL) {
+    res.send("The URL you entered doesn't exist");
+  }
   res.redirect(longURL);
 });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 // displays current port in terminal to prevent confusion
