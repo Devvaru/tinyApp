@@ -22,6 +22,7 @@
             <!-- table headers -->
             <th scope="col">Short URL ID</th>
             <th scope="col">Long URL</th>
+            <th scope="col">Edit</th>
             <th scope="col">Delete</th>
           </tr>
         </thead>
@@ -36,10 +37,15 @@
                 <%= urls[id] %>
               </td>
               <td>
+                <!-- creates edit button for each row based on the id -->
+                <a href="/urls/<%= id %>" class="btn btn-primary">Edit</a>
+
+              </td>
+              <td>
                 <!-- creates delete button for each row based on the id -->
                 <form method="POST" action="/urls/<%= id %>/delete">
                   <button type="submit" name="Delete"
-                    style="color: red; border-color: red; background-color: white; padding: 8px; border-style: solid; border-radius: 5px;">
+                    style="color: red; border-color: red; background-color: white; padding: 5px; border-style: solid; border-radius: 3px;">
                     Delete
                   </button>
                 </form>
