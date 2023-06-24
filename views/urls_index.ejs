@@ -13,43 +13,53 @@
 
 <body>
   <%- include('partials/_header.ejs') %>
-  <main style="margin: 1em;">
-    <h3>My URLs</h3>
-    <table class="table">
-      
-      <thead>
-        <tr>
-          <!-- table headers -->
-          <th scope="col">Short URL ID</th>
-          <th scope="col">Long URL</th>
-        </tr>
-      </thead>
-      <tbody>
-      <!-- loop through ids in urls and display them in a table -->
-        <% for (let id in urls) { %>
-          <tr>
-            <td>
-              <%= id %>
-            </td>
-            <td>
-              <%= urls[id] %>
-            </td>
-          </tr>
-          <% } %>
+    <main style="margin: 1em;">
+      <h3>My URLs</h3>
+      <table class="table">
 
-      </tbody>
-    </table>
-  </main>
-  <!-- Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
+        <thead>
+          <tr>
+            <!-- table headers -->
+            <th scope="col">Short URL ID</th>
+            <th scope="col">Long URL</th>
+            <th scope="col">Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- loop through ids in urls and display them in a table -->
+          <% for (let id in urls) { %>
+            <tr>
+              <td>
+                <%= id %>
+              </td>
+              <td>
+                <%= urls[id] %>
+              </td>
+              <td>
+                <!-- creates delete button for each row based on the id -->
+                <form method="POST" action="/urls/<%= id %>/delete">
+                  <button type="submit" name="Delete"
+                    style="color: red; border-color: red; background-color: white; padding: 8px; border-style: solid; border-radius: 5px;">
+                    Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <% } %>
+
+        </tbody>
+      </table>
+    </main>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"></script>
 </body>
 
 </html>
