@@ -78,7 +78,6 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-
 // Logout, removes username cookie
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
