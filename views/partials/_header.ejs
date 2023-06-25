@@ -10,18 +10,30 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
 
-        <form class="form-inline" action="/login" method="POST">
-          <div class="form-group mb-2">
-            <label for="username" style="color: white; margin-right: 1em;">Login:</label>
-            <input type="text" name="username" placeholder="username" style="width: 300px" />
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </div>
-        </form>
-        <div>
-          <p class="nav-item nav-link" style="color: white;">
-            Logged in with: <%= username %>
-          </p>
-        </div>
+        <!-- if no username set, login form - if username is set, logout button -->
+        <% if(!username){ %>
+
+          <form class="form-inline" action="/login" method="POST">
+            <div class="form-group mb-2">
+              <label for="username" style="color: white; margin-right: 1em;">Login:</label>
+              <input type="text" name="username" placeholder="username" style="width: 300px" />
+              <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+          </form>
+
+          <% } else{ %>
+
+            <p class="nav-item nav-link" style="color: white;">
+              Logged in with: <%= username %>
+                <form method="POST" action="/logout">
+                  <button type="submit" name="Logout" class="btn btn-primary">
+                    Logout
+                  </button>
+                </form>
+            </p>
+
+            <% } %>
+
       </div>
     </div>
   </nav>
