@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -6,6 +7,8 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 // body parser library - parses post body into a string
 app.use(express.urlencoded({ extended: true }));
+// cookie parser - parses cookie, accessable with res.cookies
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -18,18 +21,25 @@ app.get("/", (req, res) => {
 
 // render list of long urls with their short urls
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    username: req.cookies["username"], // display username on this page
+    urls: urlDatabase
+  };
   res.render("urls_index", templateVars);
 });
 
 // render new url form
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"], // display username on this page
+    urls: urlDatabase
+  };
+  res.render("urls_new", templateVars);
 });
 
 // render individual pages for each url, accessed by its short url
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
 
@@ -51,6 +61,11 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // updates urls with button
 app.post("/urls/:id/edit", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"] // display username on this page
+  };
+  res.render(templateVars);
+
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
@@ -83,7 +98,7 @@ app.listen(PORT, () => {
 });
 
 // generates ID with a length of 6
-const generateRandomString = function() {
+const generateRandomString = function () {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const randomArray = [];
 
