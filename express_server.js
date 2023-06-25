@@ -57,6 +57,12 @@ app.post("/urls/:id/edit", (req, res) => {
   res.redirect("/urls");
 });
 
+// login request, saves username as cookie
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("/urls");
+});
+
 // redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
 app.get("/u/:id", (req, res) => {
   const paramsID = req.params.id;
