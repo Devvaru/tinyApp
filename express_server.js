@@ -105,7 +105,7 @@ app.listen(PORT, () => {
 });
 
 // generates ID with a length of 6
-const generateRandomString = function () {
+const generateRandomString = function() {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const randomArray = [];
 
