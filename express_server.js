@@ -72,9 +72,16 @@ app.post("/urls/:id/edit", (req, res) => {
   res.redirect("/urls");
 });
 
-// login request, saves username as cookie
+// login, saves username as cookie
 app.post("/login", (req, res) => {
   res.cookie('username', req.body.username);
+  res.redirect("/urls");
+});
+
+
+// Logout, removes username cookie
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
   res.redirect("/urls");
 });
 
