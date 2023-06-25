@@ -13,11 +13,15 @@
         <form class="form-inline" action="/login" method="POST">
           <div class="form-group mb-2">
             <label for="username" style="color: white; margin-right: 1em;">Login:</label>
-            <input type="text" name="username" placeholder="username"
-              style="width: 300px" />
+            <input type="text" name="username" placeholder="username" style="width: 300px" />
             <button type="submit" class="btn btn-primary">Submit</button>
           </div>
         </form>
+        <div>
+          <p class="nav-item nav-link" style="color: white;">
+            Logged in with: <%= username %>
+          </p>
+        </div>
       </div>
     </div>
   </nav>
