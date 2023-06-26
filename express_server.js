@@ -52,10 +52,11 @@ app.get("/urls/new", (req, res) => {
 
 // render individual pages for each url, accessed by its short url
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { 
-    id: req.params.id, 
-    longURL: urlDatabase[req.params.id], 
-    username: req.cookies["username"] };
+  const templateVars = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"]
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -83,7 +84,8 @@ app.get("/urls.json", (req, res) => {
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const id = generateRandomString();
-  urlDatabase[id] = req.body.longURL; // save longURL from submissions and generate id, store in urlDatabase
+  const longURL = req.body.longURL; // save longURL from submissions
+  urlDatabase[id] = longURL; // store id and longURL in urlDatabase
   console.log(urlDatabase);
   res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
 });
@@ -119,6 +121,26 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
+});
+
+app.post("/register", (req, res) => {
+  const id = "user" + generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+
+  users[id] = {
+    id,
+    email,
+    password
+  };
+
+  const templateVars = {
+    user_id: id
+  };
+  res.cookie('user_id', templateVars.user_id);
+
+  console.log(users);
+  res.redirect("urls");
 });
 
 // displays current port in terminal to prevent confusion
