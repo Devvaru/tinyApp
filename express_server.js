@@ -52,7 +52,10 @@ app.get("/urls/new", (req, res) => {
 
 // render individual pages for each url, accessed by its short url
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
+  const templateVars = { 
+    id: req.params.id, 
+    longURL: urlDatabase[req.params.id], 
+    username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
 
@@ -61,6 +64,20 @@ app.get("/register", (req, res) => {
     username: req.cookies["username"], // display username on this page
   };
   res.render("urls_registration", templateVars);
+});
+
+// redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
+app.get("/u/:id", (req, res) => {
+  const paramsID = req.params.id;
+  const longURL = urlDatabase[paramsID];
+  if (!longURL) {
+    res.send("The URL you entered doesn't exist");
+  }
+  res.redirect(longURL);
+});
+
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
 });
 
 app.post("/urls", (req, res) => {
@@ -104,27 +121,13 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-// redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
-app.get("/u/:id", (req, res) => {
-  const paramsID = req.params.id;
-  const longURL = urlDatabase[paramsID];
-  if (!longURL) {
-    res.send("The URL you entered doesn't exist");
-  }
-  res.redirect(longURL);
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
 // displays current port in terminal to prevent confusion
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
 // generates ID with a length of 6
-const generateRandomString = function() {
+const generateRandomString = function () {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const randomArray = [];
 
