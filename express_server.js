@@ -113,16 +113,24 @@ app.post("/urls/:id/edit", (req, res) => {
   res.redirect("/urls");
 });
 
-// login, saves username as cookie
+// login
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
   if (!getUserByEmail(email)) { // prevents multiple registrations under an email
-    res.status(400).send("There are no accounts under this email, please register");
+    res.status(403).send("There are no accounts under this email, please register");
     return;
+  } else {
+    const user = getUserByEmail(email);
+    const userId = user.id;
+    res.cookie('user_id', userId); // create user_id cookie based on user ID
   }
 
+  if (!getPasswordByEmail(users, email)) { // checks for correct password
+    res.status(403).send("Incorrect password");
+    return;
+  }
 
   if (email.length < 1 || password.length < 1) { // email and password fields must have content
     res.status(400).send("Please fill out all fields");
@@ -135,7 +143,7 @@ app.post("/login", (req, res) => {
 // Logout, removes user_id cookie
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 // registers email and password in users object
@@ -188,7 +196,7 @@ const generateRandomString = function() {
   return randomString;
 };
 
-// checks weather email already exists
+// checks whether email already exists
 const getUserByEmail = function(email) {
   let user;
 
@@ -196,6 +204,16 @@ const getUserByEmail = function(email) {
     if (users[user_id].email === email) {
       user = users[user_id];
       return user;
+    }
+  }
+  return null;
+};
+
+// checks whether password entered is correct
+const getPasswordByEmail = function(users, email) {
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId].password;
     }
   }
   return null;
