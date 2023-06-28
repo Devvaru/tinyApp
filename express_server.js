@@ -10,6 +10,11 @@ app.use(express.urlencoded({ extended: true }));
 // cookie parser - parses cookie, accessable with res.cookies
 app.use(cookieParser());
 
+// displays current port in terminal to prevent confusion
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -89,11 +94,9 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
   const id = generateRandomString();
   const longURL = req.body.longURL; // save longURL from submissions
   urlDatabase[id] = longURL; // store id and longURL in urlDatabase
-  console.log(urlDatabase);
   res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
 });
 
@@ -101,7 +104,6 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const paramsID = req.params.id;
   delete urlDatabase[paramsID];
-  console.log(urlDatabase);
   res.redirect("/urls");
 });
 
@@ -118,7 +120,7 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  if (email.length < 1 || password.length < 1) { // email and password fields must have content
+  if ((!email || !password) || email.length < 1 || password.length < 1) { // email and password fields must have content
     res.status(400).send("Please fill out all fields");
     return;
   }
@@ -168,18 +170,8 @@ app.post("/register", (req, res) => {
     password
   };
 
-  const templateVars = {
-    user_id: id
-  };
-  res.cookie('user_id', templateVars.user_id); // create user_id cookie based on user ID
-
-  console.log(users);
+  res.cookie('user_id', id); // create user_id cookie based on user ID
   res.redirect("urls");
-});
-
-// displays current port in terminal to prevent confusion
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
 });
 
 // generates ID with a length of 6
