@@ -119,7 +119,7 @@ app.post("/register", (req, res) => {
     return;
   }
 
-  if (email.length < 1 || password.length < 1) { // email and password fields must have content
+  if (!formValidation(email, password)) { // email and password fields must correct have content
     res.status(400).send("Please fill out all fields");
     return;
   }
@@ -146,7 +146,7 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  if ((!email || !password) || email.length < 1 || password.length < 1) { // email and password fields must have content
+  if (!formValidation(email, password)) { // email and password fields must correct have content
     res.status(400).send("Please fill out all fields");
     return;
   }
@@ -211,4 +211,12 @@ const getPasswordByEmail = function(users, email, password) {
     }
   }
   return false;
+};
+
+// checks whether login and register fields are filled out properly
+const formValidation = function(email, password) {
+  if ((!email || !password) || email.length < 1 || password.length < 1) {
+    return false;
+  }
+  return true;
 };
