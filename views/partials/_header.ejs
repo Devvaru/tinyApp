@@ -10,21 +10,18 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
 
-        <!-- if no user_id set, login form - if user_id is set, logout button -->
+        <!-- if no user_id set, login link - if user_id is set, logout button -->
+
         <% if(!user){ %>
 
-          <form class="form-inline" action="/login" method="POST">
-            <div class="form-group mb-2">
-              <label for="user_id" style="color: white; margin-right: 1em;">Login:</label>
-              <input type="text" name="user_id" placeholder="email" style="width: 300px" />
-              <button type="submit" class="btn btn-primary">Login</button>
-            </div>
-          </form>
+          <!-- links to login page -->
+          <a href="/login" class="btn btn-primary">Login</a>
 
           <% } else{ %>
 
             <p class="nav-item nav-link" style="color: white;">
               Logged in with: <%= user.email %>
+                <!-- Removes user cookie -->
                 <form method="POST" action="/logout">
                   <button type="submit" name="Logout" class="btn btn-primary">
                     Logout
@@ -33,6 +30,8 @@
             </p>
 
             <% } %>
+              <!-- links to registration page -->
+              <a href="/register" class="btn btn-primary">Register</a>
 
       </div>
     </div>
