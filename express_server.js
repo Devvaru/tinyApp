@@ -1,4 +1,5 @@
 const express = require("express");
+const { generateRandomString, getUserByEmail, getPasswordByEmail, formValidation } = require("./helper_functions");
 const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
@@ -114,7 +115,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  if (getUserByEmail(email)) { // prevents multiple registrations under an email
+  if (getUserByEmail(email, users)) { // prevents multiple registrations under an email
     res.status(400).send("This email is already registered");
     return;
   }
@@ -151,11 +152,11 @@ app.post("/login", (req, res) => {
     return;
   }
 
-  if (!getUserByEmail(email)) { // prevents multiple registrations under an email
+  if (!getUserByEmail(email, users)) { // prevents multiple registrations under an email
     res.status(403).send("There are no accounts under this email, please register");
     return;
   } else {
-    const user = getUserByEmail(email);
+    const user = getUserByEmail(email, users);
     const userId = user.id;
     res.cookie('user_id', userId); // create user_id cookie based on user ID
   }
@@ -173,50 +174,3 @@ app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.redirect("/login");
 });
-
-// generates ID with a length of 6
-const generateRandomString = function() {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const randomArray = [];
-
-  for (let i = 0; randomArray.length < 6; i++) {
-    const randomNum = Math.round((Math.random() * characters.length));
-    randomArray.push(characters[randomNum]);
-  }
-
-  const randomString = randomArray.join('');
-  return randomString;
-};
-
-// checks whether email already exists
-const getUserByEmail = function(email) {
-  let user;
-
-  for (const user_id in users) {
-    if (users[user_id].email === email) {
-      user = users[user_id];
-      return user;
-    }
-  }
-  return null;
-};
-
-// checks whether password entered is correct
-const getPasswordByEmail = function(users, email, password) {
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      if (users[userId].password === password) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-// checks whether login and register fields are filled out properly
-const formValidation = function(email, password) {
-  if ((!email || !password) || email.length < 1 || password.length < 1) {
-    return false;
-  }
-  return true;
-};
