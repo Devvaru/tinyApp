@@ -118,6 +118,16 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
+  if (email.length < 1 || password.length < 1) { // email and password fields must have content
+    res.status(400).send("Please fill out all fields");
+    return;
+  }
+
+  if (!getPasswordByEmail(users, email, password)) { // checks for correct password
+    res.status(403).send("Incorrect password");
+    return;
+  }
+
   if (!getUserByEmail(email)) { // prevents multiple registrations under an email
     res.status(403).send("There are no accounts under this email, please register");
     return;
@@ -125,16 +135,6 @@ app.post("/login", (req, res) => {
     const user = getUserByEmail(email);
     const userId = user.id;
     res.cookie('user_id', userId); // create user_id cookie based on user ID
-  }
-
-  if (!getPasswordByEmail(users, email)) { // checks for correct password
-    res.status(403).send("Incorrect password");
-    return;
-  }
-
-  if (email.length < 1 || password.length < 1) { // email and password fields must have content
-    res.status(400).send("Please fill out all fields");
-    return;
   }
 
   res.redirect("/urls");
@@ -210,11 +210,12 @@ const getUserByEmail = function(email) {
 };
 
 // checks whether password entered is correct
-const getPasswordByEmail = function(users, email) {
+const getPasswordByEmail = function(users, email, password) {
   for (const userId in users) {
     if (users[userId].email === email) {
-      return users[userId].password;
+      if (users[userId].password === password)
+        return true;
     }
   }
-  return null;
+  return false;
 };
