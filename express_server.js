@@ -213,8 +213,9 @@ const getUserByEmail = function(email) {
 const getPasswordByEmail = function(users, email, password) {
   for (const userId in users) {
     if (users[userId].email === email) {
-      if (users[userId].password === password)
+      if (users[userId].password === password) {
         return true;
+      }
     }
   }
   return false;
