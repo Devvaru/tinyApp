@@ -118,17 +118,18 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+// registers email and password in users object
 app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
 
-  if (getUserByEmail(email)) {
+  if (getUserByEmail(email)) { // prevents multiple registrations under an email
     res.status(400).send("This email is already registered");
     return;
   }
 
-  if (email.length < 1 || password.length < 1) {
+  if (email.length < 1 || password.length < 1) { // email and password fields must have content
     res.status(400).send("Please fill out all fields");
     return;
   }
@@ -142,7 +143,7 @@ app.post("/register", (req, res) => {
   const templateVars = {
     user_id: id
   };
-  res.cookie('user_id', templateVars.user_id);
+  res.cookie('user_id', templateVars.user_id); // create user_id cookie based on user ID
 
   console.log(users);
   res.redirect("urls");
@@ -167,6 +168,7 @@ const generateRandomString = function() {
   return randomString;
 };
 
+// checks weather email already exists
 const getUserByEmail = function(email) {
   let user;
 
