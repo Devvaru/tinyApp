@@ -37,6 +37,10 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
 // render list of long urls with their short urls
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -44,6 +48,13 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase
   };
   res.render("urls_index", templateVars);
+});
+
+app.post("/urls", (req, res) => {
+  const id = generateRandomString();
+  const longURL = req.body.longURL; // save longURL from submissions
+  urlDatabase[id] = longURL; // store id and longURL in urlDatabase
+  res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
 });
 
 // render new url form
@@ -65,20 +76,6 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.get("/register", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]], // display user on this page
-  };
-  res.render("registration", templateVars);
-});
-
-app.get("/login", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]], // display user on this page
-  };
-  res.render("login", templateVars);
-});
-
 // redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
 app.get("/u/:id", (req, res) => {
   const paramsID = req.params.id;
@@ -87,17 +84,6 @@ app.get("/u/:id", (req, res) => {
     res.send("The URL you entered doesn't exist");
   }
   res.redirect(longURL);
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.post("/urls", (req, res) => {
-  const id = generateRandomString();
-  const longURL = req.body.longURL; // save longURL from submissions
-  urlDatabase[id] = longURL; // store id and longURL in urlDatabase
-  res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
 });
 
 // delete urls with button
@@ -115,37 +101,11 @@ app.post("/urls/:id/edit", (req, res) => {
   res.redirect("/urls");
 });
 
-// login
-app.post("/login", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-
-  if ((!email || !password) || email.length < 1 || password.length < 1) { // email and password fields must have content
-    res.status(400).send("Please fill out all fields");
-    return;
-  }
-
-  if (!getPasswordByEmail(users, email, password)) { // checks for correct password
-    res.status(403).send("Incorrect password");
-    return;
-  }
-
-  if (!getUserByEmail(email)) { // prevents multiple registrations under an email
-    res.status(403).send("There are no accounts under this email, please register");
-    return;
-  } else {
-    const user = getUserByEmail(email);
-    const userId = user.id;
-    res.cookie('user_id', userId); // create user_id cookie based on user ID
-  }
-
-  res.redirect("/urls");
-});
-
-// Logout, removes user_id cookie
-app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
-  res.redirect("/login");
+app.get("/register", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]], // display user on this page
+  };
+  res.render("registration", templateVars);
 });
 
 // registers email and password in users object
@@ -172,6 +132,46 @@ app.post("/register", (req, res) => {
 
   res.cookie('user_id', id); // create user_id cookie based on user ID
   res.redirect("urls");
+});
+
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]], // display user on this page
+  };
+  res.render("login", templateVars);
+});
+
+// login
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if ((!email || !password) || email.length < 1 || password.length < 1) { // email and password fields must have content
+    res.status(400).send("Please fill out all fields");
+    return;
+  }
+
+  if (!getUserByEmail(email)) { // prevents multiple registrations under an email
+    res.status(403).send("There are no accounts under this email, please register");
+    return;
+  } else {
+    const user = getUserByEmail(email);
+    const userId = user.id;
+    res.cookie('user_id', userId); // create user_id cookie based on user ID
+  }
+
+  if (!getPasswordByEmail(users, email, password)) { // checks for correct password
+    res.status(403).send("Incorrect password");
+    return;
+  }
+
+  res.redirect("/urls");
+});
+
+// Logout, removes user_id cookie
+app.post("/logout", (req, res) => {
+  res.clearCookie('user_id');
+  res.redirect("/login");
 });
 
 // generates ID with a length of 6
