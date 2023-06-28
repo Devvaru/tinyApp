@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
 // render list of long urls with their short urls
 app.get("/urls", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"], // display username on this page
+    user: users[req.cookies["user_id"]],
     urls: urlDatabase
   };
   res.render("urls_index", templateVars);
@@ -44,7 +44,7 @@ app.get("/urls", (req, res) => {
 // render new url form
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"], // display username on this page
+    user: users[req.cookies["user_id"]], // display user on this page
     urls: urlDatabase
   };
   res.render("urls_new", templateVars);
@@ -55,14 +55,14 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_show", templateVars);
 });
 
 app.get("/register", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"], // display username on this page
+    user: users[req.cookies["user_id"]], // display user on this page
   };
   res.render("urls_registration", templateVars);
 });
@@ -100,11 +100,6 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // updates urls with button
 app.post("/urls/:id/edit", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"] // display username on this page
-  };
-  res.render(templateVars);
-
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
@@ -117,9 +112,9 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-// Logout, removes username cookie
+// Logout, removes user_id cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 
@@ -149,7 +144,7 @@ app.listen(PORT, () => {
 });
 
 // generates ID with a length of 6
-const generateRandomString = function () {
+const generateRandomString = function() {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const randomArray = [];
 
