@@ -64,7 +64,14 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]], // display user on this page
   };
-  res.render("urls_registration", templateVars);
+  res.render("registration", templateVars);
+});
+
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]], // display user on this page
+  };
+  res.render("login", templateVars);
 });
 
 // redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
@@ -108,7 +115,20 @@ app.post("/urls/:id/edit", (req, res) => {
 
 // login, saves username as cookie
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (!getUserByEmail(email)) { // prevents multiple registrations under an email
+    res.status(400).send("There are no accounts under this email, please register");
+    return;
+  }
+
+
+  if (email.length < 1 || password.length < 1) { // email and password fields must have content
+    res.status(400).send("Please fill out all fields");
+    return;
+  }
+
   res.redirect("/urls");
 });
 
