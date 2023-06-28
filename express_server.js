@@ -119,9 +119,19 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const id = "user" + generateRandomString();
+  const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
+
+  if (getUserByEmail(email)) {
+    res.status(400).send("This email is already registered");
+    return;
+  }
+
+  if (email.length < 1 || password.length < 1) {
+    res.status(400).send("Please fill out all fields");
+    return;
+  }
 
   users[id] = {
     id,
@@ -155,4 +165,16 @@ const generateRandomString = function() {
 
   const randomString = randomArray.join('');
   return randomString;
+};
+
+const getUserByEmail = function(email) {
+  let user;
+
+  for (const user_id in users) {
+    if (users[user_id].email === email) {
+      user = users[user_id];
+      return user;
+    }
+  }
+  return null;
 };
