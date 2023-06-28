@@ -11,11 +11,13 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
 
         <!-- if no user_id set, login link - if user_id is set, logout button -->
-
         <% if(!user){ %>
 
           <!-- links to login page -->
           <a href="/login" class="btn btn-primary">Login</a>
+
+          <!-- links to registration page -->
+          <a href="/register" class="btn btn-primary">Register</a>
 
           <% } else{ %>
 
@@ -30,8 +32,6 @@
             </p>
 
             <% } %>
-              <!-- links to registration page -->
-              <a href="/register" class="btn btn-primary">Register</a>
 
       </div>
     </div>
