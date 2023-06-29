@@ -34,6 +34,8 @@ const users = {
   },
 };
 
+let loggedIn = false; // toggle logged in state
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -106,7 +108,12 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]], // display user on this page
   };
-  res.render("registration", templateVars);
+
+  if (loggedIn) {
+    res.redirect("urls");
+  } else {
+    res.render("registration", templateVars);
+  }
 });
 
 // registers email and password in users object
@@ -131,6 +138,7 @@ app.post("/register", (req, res) => {
     password
   };
 
+  loggedIn = true;
   res.cookie('user_id', id); // create user_id cookie based on user ID
   res.redirect("urls");
 });
@@ -139,7 +147,12 @@ app.get("/login", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]], // display user on this page
   };
-  res.render("login", templateVars);
+
+  if (loggedIn) {
+    res.redirect("urls");
+  } else {
+    res.render("login", templateVars);
+  }
 });
 
 // login
@@ -166,11 +179,13 @@ app.post("/login", (req, res) => {
     return;
   }
 
+  loggedIn = true;
   res.redirect("/urls");
 });
 
 // Logout, removes user_id cookie
 app.post("/logout", (req, res) => {
+  loggedIn = false;
   res.clearCookie('user_id');
   res.redirect("/login");
 });
