@@ -54,6 +54,10 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  if (!loggedIn) {
+    res.status(403).send("Please log in to proceed");
+    return;
+  }
   const id = generateRandomString();
   const longURL = req.body.longURL; // save longURL from submissions
   urlDatabase[id] = longURL; // store id and longURL in urlDatabase
@@ -66,7 +70,12 @@ app.get("/urls/new", (req, res) => {
     user: users[req.cookies["user_id"]], // display user on this page
     urls: urlDatabase
   };
-  res.render("urls_new", templateVars);
+
+  if (!loggedIn) {
+    res.redirect("/login");
+  } else {
+    res.render("urls_new", templateVars);
+  }
 });
 
 // render individual pages for each url, accessed by its short url
@@ -84,7 +93,7 @@ app.get("/u/:id", (req, res) => {
   const paramsID = req.params.id;
   const longURL = urlDatabase[paramsID];
   if (!longURL) {
-    res.send("The URL you entered doesn't exist");
+    res.send("The ID you entered does not exist");
   }
   res.redirect(longURL);
 });
@@ -110,7 +119,7 @@ app.get("/register", (req, res) => {
   };
 
   if (loggedIn) {
-    res.redirect("urls");
+    res.redirect("/urls");
   } else {
     res.render("registration", templateVars);
   }
@@ -140,7 +149,7 @@ app.post("/register", (req, res) => {
 
   loggedIn = true;
   res.cookie('user_id', id); // create user_id cookie based on user ID
-  res.redirect("urls");
+  res.redirect("/urls");
 });
 
 app.get("/login", (req, res) => {
@@ -149,7 +158,7 @@ app.get("/login", (req, res) => {
   };
 
   if (loggedIn) {
-    res.redirect("urls");
+    res.redirect("/urls");
   } else {
     res.render("login", templateVars);
   }
