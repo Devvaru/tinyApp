@@ -45,4 +45,15 @@ const formValidation = function(email, password) {
   return true;
 };
 
-module.exports = { generateRandomString, getUserByEmail, getPasswordByEmail, formValidation };
+// checks whether a user has urls and returns the urls
+const urlsForUser = function(id, urlDatabase) {
+  const urls = [];
+  for (let userID in urlDatabase) {
+    if (userID === id) {
+      urls.push(urlDatabase[id]);
+    }
+  }
+  return urls;
+};
+
+module.exports = { generateRandomString, getUserByEmail, getPasswordByEmail, formValidation, urlsForUser };
