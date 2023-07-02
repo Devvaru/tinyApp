@@ -47,11 +47,15 @@ const formValidation = function(email, password) {
 
 // checks whether a user has urls and returns the urls
 const urlsForUser = function(id, urlDatabase) {
-  const urls = [];
-  for (let userID in urlDatabase) {
-    if (userID === id) {
-      urls.push(urlDatabase[id]);
+  let urls = {};
+  for (let urlID in urlDatabase) {
+    if (urlDatabase[urlID].userID === id) {
+      urls[urlID] = {longURL: urlDatabase[urlID].longURL, userID: urlDatabase[urlID].userID};
     }
+  }
+
+  if (Object.keys(urls).length === 0) {
+    return null;
   }
   return urls;
 };
