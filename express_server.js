@@ -1,6 +1,7 @@
 const express = require("express");
-const { generateRandomString, getUserByEmail, getPasswordByEmail, formValidation, urlsForUser } = require("./helper_functions");
+const { generateRandomString, getUserByEmail, formValidation, urlsForUser } = require("./helper_functions");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -196,13 +197,14 @@ app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (getUserByEmail(email, users)) { // prevents multiple registrations under an email
     res.status(400).send("This email is already registered");
     return;
   }
 
-  if (!formValidation(email, password)) { // email and password fields must correct have content
+  if (!formValidation(email, password)) { // email and password fields must have correct content
     res.status(400).send("Please fill out all fields");
     return;
   }
@@ -210,7 +212,7 @@ app.post("/register", (req, res) => {
   users[id] = {
     id,
     email,
-    password
+    password: hashedPassword
   };
 
   loggedIn = true;
@@ -234,8 +236,10 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const user = getUserByEmail(email, users);
+  const passwordIsValid = bcrypt.compareSync(password, user.password); // returns true if valid
 
-  if (!formValidation(email, password)) { // email and password fields must correct have content
+  if (!formValidation(email, password)) { // email and password fields must have correct content
     res.status(400).send("Please fill out all fields");
     return;
   }
@@ -249,7 +253,7 @@ app.post("/login", (req, res) => {
     res.cookie('user_id', userId); // create user_id cookie based on user ID
   }
 
-  if (!getPasswordByEmail(users, email, password)) { // checks for correct password
+  if (!passwordIsValid) { // checks for correct password
     res.status(403).send("Incorrect password");
     return;
   }
