@@ -1,5 +1,5 @@
 const express = require("express");
-const { generateRandomString, getUserByEmail, getPasswordByEmail, formValidation } = require("./helper_functions");
+const { generateRandomString, getUserByEmail, getPasswordByEmail, formValidation, urlsForUser } = require("./helper_functions");
 const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
@@ -57,11 +57,13 @@ app.get("/urls", (req, res) => {
     return;
   }
 
+  const id = req.cookies["user_id"];
+  const userURLs = urlsForUser(id, urlDatabase);
   const templateVars = {
     user: users[req.cookies["user_id"]],
-    urls: urlDatabase
+    urls: userURLs
   };
-  
+
   res.render("urls_index", templateVars);
 });
 
@@ -98,10 +100,21 @@ app.get("/urls/new", (req, res) => {
 
 // render individual pages for each url, accessed by its short url
 app.get("/urls/:id", (req, res) => {
+  if (!loggedIn) {
+    res.status(403).send("Please log in to proceed");
+    return;
+  }
+
+  const id = req.cookies["user_id"];
+  if (!urlsForUser(id, urlDatabase)) {
+    res.status(403).send("This URL can only be accessed by its creator");
+    return;
+  }
+
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
-    user: users[req.cookies["user_id"]],
+    user: users[req.cookies["user_id"]]
   };
 
   res.render("urls_show", templateVars);
