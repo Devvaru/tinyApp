@@ -11,6 +11,7 @@ An application for shortening URLs
 ## Usage
 
 **Install dependencies**
+* bcryptjs
 * cookie-parser
 * ejs
 * express
