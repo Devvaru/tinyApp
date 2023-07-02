@@ -53,10 +53,6 @@ const urlsForUser = function(id, urlDatabase) {
       urls[urlID] = {longURL: urlDatabase[urlID].longURL, userID: urlDatabase[urlID].userID};
     }
   }
-
-  if (Object.keys(urls).length === 0) {
-    return null;
-  }
   return urls;
 };
 
