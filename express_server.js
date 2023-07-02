@@ -106,7 +106,7 @@ app.get("/urls/:id", (req, res) => {
   }
 
   const id = req.cookies["user_id"];
-  if (!urlsForUser(id, urlDatabase)) {
+  if (Object.keys(urlsForUser(id, urlDatabase)).length === 0) {
     res.status(403).send("This URL can only be accessed by its creator");
     return;
   }
@@ -125,7 +125,7 @@ app.get("/u/:id", (req, res) => {
   const paramsID = req.params.id;
   const longURL = urlDatabase[paramsID].longURL;
   if (!longURL) {
-    res.send("The ID you entered does not exist");
+    res.status(404).send("The ID you entered does not exist");
   }
   res.redirect(longURL);
 });
@@ -133,6 +133,23 @@ app.get("/u/:id", (req, res) => {
 // delete urls with button
 app.post("/urls/:id/delete", (req, res) => {
   const paramsID = req.params.id;
+  const userURLs = urlsForUser(paramsID, urlDatabase);
+
+  if (!urlDatabase[paramsID]) {
+    res.status(404).send("The ID you entered does not exist");
+    return;
+  }
+
+  if (!loggedIn) {
+    res.status(403).send("Please log in to proceed");
+    return;
+  }
+
+  if (!paramsID in userURLs) {
+    res.status(403).send("Access Denied");
+    return;
+  }
+
   delete urlDatabase[paramsID];
   res.redirect("/urls");
 });
