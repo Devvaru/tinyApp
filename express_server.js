@@ -28,13 +28,13 @@ const urlDatabase = {
 };
 
 const users = {
-  userRandomID: {
-    id: "userRandomID",
+  aJ48lW: {
+    id: "aJ48lW",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: "1234",
   },
-  user2RandomID: {
-    id: "user2RandomID",
+  g6Ymc8: {
+    id: "g6Ymc8",
     email: "user2@example.com",
     password: "dishwasher-funk",
   },
@@ -66,7 +66,13 @@ app.post("/urls", (req, res) => {
   }
   const id = generateRandomString();
   const longURL = req.body.longURL; // save longURL from submissions
-  urlDatabase[id] = longURL; // store id and longURL in urlDatabase
+  const userID = users[req.cookies["user_id"]];
+
+  const newUrlObj = {}; // new url object to add to urlDatabase
+  newUrlObj.userID = userID; // store userID with create url
+  newUrlObj.longURL = longURL; // store id and longURL in urlDatabase
+  urlDatabase[id] = newUrlObj; // add new url object to urlDatabase
+
   res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
 });
 
@@ -88,16 +94,17 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[req.cookies["user_id"]],
   };
+
   res.render("urls_show", templateVars);
 });
 
 // redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
 app.get("/u/:id", (req, res) => {
   const paramsID = req.params.id;
-  const longURL = urlDatabase[paramsID];
+  const longURL = urlDatabase[paramsID].longURL;
   if (!longURL) {
     res.send("The ID you entered does not exist");
   }
@@ -115,7 +122,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id/edit", (req, res) => {
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL].longURL = longURL;
   res.redirect("/urls");
 });
 
