@@ -25,18 +25,6 @@ const getUserByEmail = function(email, users) {
   return null;
 };
 
-// checks whether password entered is correct
-const getPasswordByEmail = function(users, email, password) {
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      if (users[userId].password === password) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
 // checks whether login and register fields are filled out properly
 const formValidation = function(email, password) {
   if ((!email || !password) || email.length < 1 || password.length < 1) {
@@ -56,4 +44,4 @@ const urlsForUser = function(id, urlDatabase) {
   return urls;
 };
 
-module.exports = { generateRandomString, getUserByEmail, getPasswordByEmail, formValidation, urlsForUser };
+module.exports = { generateRandomString, getUserByEmail, formValidation, urlsForUser };
