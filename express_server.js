@@ -1,6 +1,6 @@
 const express = require("express");
 const { generateRandomString, getUserByEmail, formValidation, urlsForUser } = require("./helper_functions");
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; // default port 8080
@@ -9,8 +9,11 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 // body parser library - parses post body into a string
 app.use(express.urlencoded({ extended: true }));
-// cookie parser - parses cookie, accessable with res.cookies
-app.use(cookieParser());
+// cookie session - creates and encrypts cookies
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2']
+}));
 
 // displays current port in terminal to prevent confusion
 app.listen(PORT, () => {
@@ -58,10 +61,10 @@ app.get("/urls", (req, res) => {
     return;
   }
 
-  const id = req.cookies["user_id"];
+  const id = req.session.user_id;
   const userURLs = urlsForUser(id, urlDatabase);
   const templateVars = {
-    user: users[req.cookies["user_id"]],
+    user: users[req.session.user_id],
     urls: userURLs
   };
 
@@ -75,7 +78,7 @@ app.post("/urls", (req, res) => {
   }
   const id = generateRandomString();
   const longURL = req.body.longURL; // save longURL from submissions
-  const userID = users[req.cookies["user_id"]];
+  const userID = users[req.session.user_id];
 
   const newUrlObj = {}; // new url object to add to urlDatabase
   newUrlObj.userID = userID; // store userID with create url
@@ -88,7 +91,7 @@ app.post("/urls", (req, res) => {
 // render new url form
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    user: users[req.cookies["user_id"]], // display user on this page
+    user: users[req.session.user_id], // display user on this page
     urls: urlDatabase
   };
 
@@ -106,7 +109,7 @@ app.get("/urls/:id", (req, res) => {
     return;
   }
 
-  const id = req.cookies["user_id"];
+  const id = req.session.user_id
   if (Object.keys(urlsForUser(id, urlDatabase)).length === 0) {
     res.status(403).send("This URL can only be accessed by its creator");
     return;
@@ -115,7 +118,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
 
   res.render("urls_show", templateVars);
@@ -182,7 +185,7 @@ app.post("/urls/:id/edit", (req, res) => {
 
 app.get("/register", (req, res) => {
   const templateVars = {
-    user: users[req.cookies["user_id"]], // display user on this page
+    user: users[req.session.user_id], // display user on this page
   };
 
   if (loggedIn) {
@@ -216,13 +219,13 @@ app.post("/register", (req, res) => {
   };
 
   loggedIn = true;
-  res.cookie('user_id', id); // create user_id cookie based on user ID
+  req.session.user_id = id; // create user_id cookie based on user ID
   res.redirect("/urls");
 });
 
 app.get("/login", (req, res) => {
   const templateVars = {
-    user: users[req.cookies["user_id"]], // display user on this page
+    user: users[req.session.user_id], // display user on this page
   };
 
   if (loggedIn) {
@@ -250,7 +253,7 @@ app.post("/login", (req, res) => {
   } else {
     const user = getUserByEmail(email, users);
     const userId = user.id;
-    res.cookie('user_id', userId); // create user_id cookie based on user ID
+    req.session.user_id = userId;; // create user_id cookie based on user ID
   }
 
   if (!passwordIsValid) { // checks for correct password
@@ -265,6 +268,6 @@ app.post("/login", (req, res) => {
 // Logout, removes user_id cookie
 app.post("/logout", (req, res) => {
   loggedIn = false;
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect("/login");
 });
