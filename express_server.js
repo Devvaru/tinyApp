@@ -122,8 +122,8 @@ app.get("/urls/:id", (req, res) => {
 
 // redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
 app.get("/u/:id", (req, res) => {
-  const paramsID = req.params.id;
-  const longURL = urlDatabase[paramsID].longURL;
+  const shortURL = req.params.id;
+  const longURL = urlDatabase[shortURL].longURL;
   if (!longURL) {
     res.status(404).send("The ID you entered does not exist");
   }
@@ -132,10 +132,10 @@ app.get("/u/:id", (req, res) => {
 
 // delete urls with button
 app.post("/urls/:id/delete", (req, res) => {
-  const paramsID = req.params.id;
-  const userURLs = urlsForUser(paramsID, urlDatabase);
+  const shortURL = req.params.id;
+  const userURLs = urlsForUser(shortURL, urlDatabase);
 
-  if (!urlDatabase[paramsID]) {
+  if (!urlDatabase[shortURL]) {
     res.status(404).send("The ID you entered does not exist");
     return;
   }
@@ -145,12 +145,12 @@ app.post("/urls/:id/delete", (req, res) => {
     return;
   }
 
-  if (!paramsID in userURLs) {
+  if (!shortURL in userURLs) {
     res.status(403).send("Access Denied");
     return;
   }
 
-  delete urlDatabase[paramsID];
+  delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
 
@@ -158,6 +158,23 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id/edit", (req, res) => {
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
+  const userURLs = urlsForUser(shortURL, urlDatabase);
+
+  if (!urlDatabase[shortURL]) {
+    res.status(404).send("The ID you entered does not exist");
+    return;
+  }
+
+  if (!loggedIn) {
+    res.status(403).send("Please log in to proceed");
+    return;
+  }
+
+  if (!shortURL in userURLs) {
+    res.status(403).send("Access Denied");
+    return;
+  }
+
   urlDatabase[shortURL].longURL = longURL;
   res.redirect("/urls");
 });
