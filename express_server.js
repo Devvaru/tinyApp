@@ -52,10 +52,16 @@ app.get("/urls.json", (req, res) => {
 
 // render list of long urls with their short urls
 app.get("/urls", (req, res) => {
+  if (!loggedIn) {
+    res.status(403).send("Please log in to view URLs");
+    return;
+  }
+
   const templateVars = {
     user: users[req.cookies["user_id"]],
     urls: urlDatabase
   };
+  
   res.render("urls_index", templateVars);
 });
 
