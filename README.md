@@ -12,7 +12,7 @@ An application for shortening URLs
 
 **Install dependencies**
 * bcryptjs
-* cookie-parser
+* cookie-session
 * ejs
 * express
 * nodemon
