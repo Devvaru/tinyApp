@@ -1,5 +1,5 @@
 const express = require("express");
-const { generateRandomString, getUserByEmail, formValidation, urlsForUser } = require("./helper_functions");
+const { generateRandomString, getUserByEmail, formValidation, urlsForUser } = require("./helpers");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const app = express();
