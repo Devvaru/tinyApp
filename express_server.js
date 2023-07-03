@@ -86,6 +86,10 @@ app.post("/urls", (req, res) => {
   newUrlObj.userID = userID; // store userID with created url
   urlDatabase[urlID] = newUrlObj; // add new url object to urlDatabase
 
+  const user_id = req.session.user_id;
+  const urls = urlsForUser(user_id, urlDatabase);
+  console.log(urls)
+
   res.redirect(`/urls/${urlID}`); // Redirects to new page for longURL and shortURL
 });
 
@@ -110,12 +114,13 @@ app.get("/urls/:id", (req, res) => {
     return;
   }
 
-  // const user_id = req.session.user_id;
-  // const urls = urlsForUser(user_id, urlDatabase);
-  // if (!(user_id in urls)) {
-  //   res.status(403).send("This URL can only be accessed by its creator");
-  //   return;
-  // }
+  const userID = req.session.user_id;
+  const urls = urlsForUser(userID, urlDatabase);
+  const urlID = req.params.id;
+  if (!(urlID in urls)) {
+    res.status(403).send("This URL can only be accessed by its creator");
+    return;
+  }
 
   const templateVars = {
     id: req.params.id,
