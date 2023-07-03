@@ -61,8 +61,8 @@ app.get("/urls", (req, res) => {
     return;
   }
 
-  const id = req.session.user_id;
-  const userURLs = urlsForUser(id, urlDatabase);
+  const userID = req.session.user_id;
+  const userURLs = urlsForUser(userID, urlDatabase);
   const templateVars = {
     user: users[req.session.user_id],
     urls: userURLs
@@ -76,16 +76,17 @@ app.post("/urls", (req, res) => {
     res.status(403).send("Please log in to proceed");
     return;
   }
-  const id = generateRandomString();
+
+  const urlID = generateRandomString();
   const longURL = req.body.longURL; // save longURL from submissions
-  const userID = users[req.session.user_id];
-
+  const userID = req.session.user_id; // get userID from cookie
   const newUrlObj = {}; // new url object to add to urlDatabase
-  newUrlObj.userID = userID; // store userID with create url
-  newUrlObj.longURL = longURL; // store id and longURL in urlDatabase
-  urlDatabase[id] = newUrlObj; // add new url object to urlDatabase
 
-  res.redirect(`/urls/${id}`); // Redirects to new page for longURL and shortURL
+  newUrlObj.longURL = longURL; // store longURL in urlDatabase
+  newUrlObj.userID = userID; // store userID with created url
+  urlDatabase[urlID] = newUrlObj; // add new url object to urlDatabase
+
+  res.redirect(`/urls/${urlID}`); // Redirects to new page for longURL and shortURL
 });
 
 // render new url form
@@ -109,11 +110,12 @@ app.get("/urls/:id", (req, res) => {
     return;
   }
 
-  const id = req.session.user_id
-  if (Object.keys(urlsForUser(id, urlDatabase)).length === 0) {
-    res.status(403).send("This URL can only be accessed by its creator");
-    return;
-  }
+  // const user_id = req.session.user_id;
+  // const urls = urlsForUser(user_id, urlDatabase);
+  // if (!(user_id in urls)) {
+  //   res.status(403).send("This URL can only be accessed by its creator");
+  //   return;
+  // }
 
   const templateVars = {
     id: req.params.id,
@@ -197,7 +199,7 @@ app.get("/register", (req, res) => {
 
 // registers email and password in users object
 app.post("/register", (req, res) => {
-  const id = generateRandomString();
+  const userID = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -212,14 +214,14 @@ app.post("/register", (req, res) => {
     return;
   }
 
-  users[id] = {
-    id,
+  users[userID] = {
+    id: userID,
     email,
     password: hashedPassword
   };
 
   loggedIn = true;
-  req.session.user_id = id; // create user_id cookie based on user ID
+  req.session.user_id = userID; // create user_id cookie based on user ID
   res.redirect("/urls");
 });
 
@@ -252,8 +254,8 @@ app.post("/login", (req, res) => {
     return;
   } else {
     const user = getUserByEmail(email, users);
-    const userId = user.id;
-    req.session.user_id = userId;; // create user_id cookie based on user ID
+    const userID = user.id;
+    req.session.user_id = userID; // create user_id cookie based on user ID
   }
 
   if (!passwordIsValid) { // checks for correct password
