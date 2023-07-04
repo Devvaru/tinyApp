@@ -46,7 +46,6 @@ app.get("/urls", (req, res) => {
 
 // generate new shortURL object
 app.post("/urls", (req, res) => {
-
   if (!isLoggedIn(req)) {
     res.status(403).send("Please log in to proceed");
     return;
@@ -227,26 +226,26 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user = getUserByEmail(email, users);
-  const passwordIsValid = bcrypt.compareSync(password, user.password); // returns true if valid
-
+  
   if (!formValidation(email, password)) { // email and password fields must have correct content
     res.status(400).send("Please fill out all fields");
     return;
   }
 
+  const passwordIsValid = bcrypt.compareSync(password, user.password); // returns true if valid
+
   if (!getUserByEmail(email, users)) { // prevents multiple registrations under an email
     res.status(403).send("There are no accounts under this email, please register");
     return;
-  } else {
-    const user = getUserByEmail(email, users);
-    const userID = user.id;
-    req.session.user_id = userID; // create user_id cookie based on user ID
   }
 
   if (!passwordIsValid) { // checks for correct password
     res.status(403).send("Incorrect password");
     return;
   }
+
+  const userID = user.id;
+  req.session.user_id = userID; // create user_id cookie based on user ID
 
   res.redirect("/urls");
 });
