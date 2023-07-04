@@ -5,12 +5,9 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; // default port 8080
 
-// set ejs as the view engine
-app.set("view engine", "ejs");
-// body parser library - parses post body into a string
-app.use(express.urlencoded({ extended: true }));
-// cookie session - creates and encrypts cookies
-app.use(cookieSession({
+app.set("view engine", "ejs"); // set ejs as the view engine
+app.use(express.urlencoded({ extended: true })); // body parser library - parses post body into a string
+app.use(cookieSession({ // cookie session - creates and encrypts cookies
   name: 'session',
   keys: ['key1', 'key2']
 }));
@@ -49,6 +46,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// generate new shortURL object
 app.post("/urls", (req, res) => {
   if (!loggedIn) {
     res.status(403).send("Please log in to proceed");
@@ -115,7 +113,7 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-// delete urls with button
+// deletes urls with button
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
   const userID = req.session.user_id;
@@ -140,7 +138,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-// updates urls with button
+// updates longURL
 app.post("/urls/:id/edit", (req, res) => {
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
@@ -166,6 +164,7 @@ app.post("/urls/:id/edit", (req, res) => {
   res.redirect("/urls");
 });
 
+// render registration page
 app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.session.user_id], // display user on this page
@@ -206,6 +205,7 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
+// renders login page if not logged in
 app.get("/login", (req, res) => {
   const templateVars = {
     user: users[req.session.user_id], // display user on this page
@@ -218,7 +218,7 @@ app.get("/login", (req, res) => {
   }
 });
 
-// login
+// login form submission
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
