@@ -19,9 +19,9 @@
           <!-- links to registration page -->
           <a class="nav-item nav-link" href="/register" class="btn btn-primary">Register</a>
 
-          <% } else{ %>
+          <% } else { %>
 
-            <p class="nav-item nav-link" style="color: white;">
+            <p class="nav-item nav-link" style="color: white; margin: 0px;">
               Logged in with: <%= user.email %>
                 <!-- Removes user cookie -->
                 <form method="POST" action="/logout">
