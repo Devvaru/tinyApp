@@ -86,10 +86,6 @@ app.post("/urls", (req, res) => {
   newUrlObj.userID = userID; // store userID with created url
   urlDatabase[urlID] = newUrlObj; // add new url object to urlDatabase
 
-  const user_id = req.session.user_id;
-  const urls = urlsForUser(user_id, urlDatabase);
-  console.log(urls)
-
   res.redirect(`/urls/${urlID}`); // Redirects to new page for longURL and shortURL
 });
 
@@ -144,7 +140,8 @@ app.get("/u/:id", (req, res) => {
 // delete urls with button
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
-  const userURLs = urlsForUser(shortURL, urlDatabase);
+  const userID = req.session.user_id;
+  const userURLs = urlsForUser(userID, urlDatabase);
 
   if (!urlDatabase[shortURL]) {
     res.status(404).send("The ID you entered does not exist");
@@ -156,7 +153,7 @@ app.post("/urls/:id/delete", (req, res) => {
     return;
   }
 
-  if (!shortURL in userURLs) {
+  if (!(shortURL in userURLs)) {
     res.status(403).send("Access Denied");
     return;
   }
@@ -169,7 +166,8 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id/edit", (req, res) => {
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
-  const userURLs = urlsForUser(shortURL, urlDatabase);
+  const userID = req.session.user_id;
+  const userURLs = urlsForUser(userID, urlDatabase);
 
   if (!urlDatabase[shortURL]) {
     res.status(404).send("The ID you entered does not exist");
@@ -181,7 +179,7 @@ app.post("/urls/:id/edit", (req, res) => {
     return;
   }
 
-  if (!shortURL in userURLs) {
+  if (!(shortURL in userURLs)) {
     res.status(403).send("Access Denied");
     return;
   }
