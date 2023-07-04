@@ -20,8 +20,9 @@ app.listen(PORT, () => {
 const urlDatabase = {};
 const users = {};
 
+// redirects to login page or urls
 app.get("/", (req, res) => {
-  if (!isLoggedIn(req)) {
+  if (!isLoggedIn(req)) { // checks if user is logged in
     res.redirect('/login');
   }
   res.redirect('/urls');
@@ -36,7 +37,7 @@ app.get("/urls", (req, res) => {
 
   const userID = req.session.user_id;
   const userURLs = urlsForUser(userID, urlDatabase);
-  const templateVars = {
+  const templateVars = { // display user on this page
     user: users[req.session.user_id],
     urls: userURLs
   };
@@ -70,8 +71,8 @@ app.get("/urls/new", (req, res) => {
     return;
   }
 
-  const templateVars = {
-    user: users[req.session.user_id], // display user on this page
+  const templateVars = { // display user on this page
+    user: users[req.session.user_id],
     urls: urlDatabase
   };
 
@@ -88,12 +89,12 @@ app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const urls = urlsForUser(userID, urlDatabase);
   const urlID = req.params.id;
-  if (!(urlID in urls)) {
+  if (!(urlID in urls)) { // checks if shortURL belongs to user
     res.status(403).send("This URL can only be accessed by its creator");
     return;
   }
 
-  const templateVars = {
+  const templateVars = { // display user on this page
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     user: users[req.session.user_id]
@@ -105,10 +106,11 @@ app.get("/urls/:id", (req, res) => {
 // redirects to the long url based on the short url as a parameter. i.e.http://localhost:8080/u/b2xVn2
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
-  if (!urlDatabase[shortURL]) {
+  if (!urlDatabase[shortURL]) { // checks if shortURL exists
     res.status(404).send("The ID you entered does not exist");
     return;
   }
+
   const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
@@ -117,7 +119,7 @@ app.get("/u/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
 
-  if (!urlDatabase[shortURL]) {
+  if (!urlDatabase[shortURL]) { // checks if shortURL exists
     res.status(404).send("The ID you entered does not exist");
     return;
   }
@@ -127,15 +129,15 @@ app.post("/urls/:id/delete", (req, res) => {
     return;
   }
 
-  const userID = req.session.user_id;
+  const userID = req.session.user_id; // get userID from cookie
   const userURLs = urlsForUser(userID, urlDatabase);
 
-  if (!(shortURL in userURLs)) {
+  if (!(shortURL in userURLs)) { // checks if shortURL belongs to user
     res.status(403).send("Access Denied");
     return;
   }
 
-  delete urlDatabase[shortURL];
+  delete urlDatabase[shortURL]; // deletes url object
   res.redirect("/urls");
 });
 
@@ -144,25 +146,25 @@ app.post("/urls/:id/edit", (req, res) => {
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
 
-  if (!urlDatabase[shortURL]) {
+  if (!urlDatabase[shortURL]) { // checks if shortURL exists
     res.status(404).send("The ID you entered does not exist");
     return;
   }
 
-  if (!isLoggedIn(req)) {
+  if (!isLoggedIn(req)) { 
     res.status(403).send("Please log in to proceed");
     return;
   }
 
-  const userID = req.session.user_id;
+  const userID = req.session.user_id; // get userID from cookie
   const userURLs = urlsForUser(userID, urlDatabase);
 
-  if (!(shortURL in userURLs)) {
+  if (!(shortURL in userURLs)) { // checks if shortURL belongs to user
     res.status(403).send("Access Denied");
     return;
   }
 
-  urlDatabase[shortURL].longURL = longURL;
+  urlDatabase[shortURL].longURL = longURL; // update url in urlDatabase
   res.redirect("/urls");
 });
 
@@ -173,8 +175,8 @@ app.get("/register", (req, res) => {
     return;
   }
 
-  const templateVars = {
-    user: users[req.session.user_id], // display user on this page
+  const templateVars = { // display user on this page
+    user: users[req.session.user_id]
   };
 
   res.render("registration", templateVars);
@@ -197,7 +199,7 @@ app.post("/register", (req, res) => {
     return;
   }
 
-  users[userID] = {
+  users[userID] = { // create user and add to users database
     id: userID,
     email,
     password: hashedPassword
@@ -214,8 +216,8 @@ app.get("/login", (req, res) => {
     return;
   }
 
-  const templateVars = {
-    user: users[req.session.user_id], // display user on this page
+  const templateVars = { // display user on this page
+    user: users[req.session.user_id]
   };
 
   res.render("login", templateVars);
