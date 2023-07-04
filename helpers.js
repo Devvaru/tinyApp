@@ -34,10 +34,10 @@ const formValidation = function(email, password) {
 };
 
 // checks whether a user has urls and returns the urls
-const urlsForUser = function(id, urlDatabase) {
+const urlsForUser = function(userID, urlDatabase) {
   let urls = {};
   for (let urlID in urlDatabase) {
-    if (urlDatabase[urlID].userID === id) {
+    if (urlDatabase[urlID].userID === userID) {
       urls[urlID] = {longURL: urlDatabase[urlID].longURL, userID: urlDatabase[urlID].userID};
     }
   }
