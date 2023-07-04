@@ -44,4 +44,8 @@ const urlsForUser = function(userID, urlDatabase) {
   return urls;
 };
 
-module.exports = { generateRandomString, getUserByEmail, formValidation, urlsForUser };
+const isLoggedIn = function(req) {
+  return !!req.session.user_id;
+};
+
+module.exports = { generateRandomString, getUserByEmail, formValidation, urlsForUser, isLoggedIn };
