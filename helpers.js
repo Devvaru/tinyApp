@@ -27,7 +27,7 @@ const getUserByEmail = function(email, users) {
 
 // checks whether login and register fields are filled out properly
 const formValidation = function(email, password) {
-  if ((!email || !password) || email.length < 1 || password.length < 1) {
+  if (!email || !password) {
     return false;
   }
   return true;
@@ -38,7 +38,7 @@ const urlsForUser = function(userID, urlDatabase) {
   let urls = {};
   for (let urlID in urlDatabase) {
     if (urlDatabase[urlID].userID === userID) {
-      urls[urlID] = {longURL: urlDatabase[urlID].longURL, userID: urlDatabase[urlID].userID};
+      urls[urlID] = urlDatabase[urlID];
     }
   }
   return urls;
