@@ -12,6 +12,10 @@ const generateRandomString = function() {
   return randomString;
 };
 
+const isLoggedIn = function(req) {
+  return !!req.session.user_id;
+};
+
 // checks whether email already exists
 const getUserByEmail = function(email, users) {
   let user;
@@ -44,8 +48,4 @@ const urlsForUser = function(userID, urlDatabase) {
   return urls;
 };
 
-const isLoggedIn = function(req) {
-  return !!req.session.user_id;
-};
-
-module.exports = { generateRandomString, getUserByEmail, formValidation, urlsForUser, isLoggedIn };
+module.exports = { generateRandomString, isLoggedIn, getUserByEmail, formValidation, urlsForUser };
