@@ -1,5 +1,5 @@
 const express = require("express");
-const { generateRandomString, getUserByEmail, formValidation, urlsForUser } = require("./helpers");
+const { generateRandomString, getUserByEmail, formValidation, urlsForUser, isLoggedIn } = require("./helpers");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const app = express();
@@ -19,10 +19,9 @@ app.listen(PORT, () => {
 
 const urlDatabase = {};
 const users = {};
-let loggedIn = false; // create islogin func, check cookies
 
 app.get("/", (req, res) => {
-  if (!loggedIn) {
+  if (!isLoggedIn(req)) {
     res.redirect('/login');
   }
   res.redirect('/urls');
@@ -30,7 +29,7 @@ app.get("/", (req, res) => {
 
 // render list of long urls with their short urls
 app.get("/urls", (req, res) => {
-  if (!loggedIn) {
+  if (!isLoggedIn(req)) {
     res.status(403).send("Please log in to view URLs");
     return;
   }
@@ -47,7 +46,8 @@ app.get("/urls", (req, res) => {
 
 // generate new shortURL object
 app.post("/urls", (req, res) => {
-  if (!loggedIn) {
+
+  if (!isLoggedIn(req)) {
     res.status(403).send("Please log in to proceed");
     return;
   }
@@ -66,7 +66,7 @@ app.post("/urls", (req, res) => {
 
 // render new url form
 app.get("/urls/new", (req, res) => {
-  if (!loggedIn) {
+  if (!isLoggedIn(req)) {
     res.redirect("/login");
     return;
   }
@@ -81,7 +81,7 @@ app.get("/urls/new", (req, res) => {
 
 // render individual pages for each url, accessed by its short url
 app.get("/urls/:id", (req, res) => {
-  if (!loggedIn) {
+  if (!isLoggedIn(req)) {
     res.status(403).send("Please log in to proceed");
     return;
   }
@@ -117,18 +117,18 @@ app.get("/u/:id", (req, res) => {
 // deletes urls with button
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
-  const userID = req.session.user_id;
 
   if (!urlDatabase[shortURL]) {
     res.status(404).send("The ID you entered does not exist");
     return;
   }
 
-  if (!loggedIn) {
+  if (!isLoggedIn(req)) {
     res.status(403).send("Please log in to proceed");
     return;
   }
 
+  const userID = req.session.user_id;
   const userURLs = urlsForUser(userID, urlDatabase);
 
   if (!(shortURL in userURLs)) {
@@ -144,18 +144,18 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id/edit", (req, res) => {
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
-  const userID = req.session.user_id;
 
   if (!urlDatabase[shortURL]) {
     res.status(404).send("The ID you entered does not exist");
     return;
   }
 
-  if (!loggedIn) {
+  if (!isLoggedIn(req)) {
     res.status(403).send("Please log in to proceed");
     return;
   }
 
+  const userID = req.session.user_id;
   const userURLs = urlsForUser(userID, urlDatabase);
 
   if (!(shortURL in userURLs)) {
@@ -169,7 +169,7 @@ app.post("/urls/:id/edit", (req, res) => {
 
 // render registration page
 app.get("/register", (req, res) => {
-  if (loggedIn) {
+  if (isLoggedIn(req)) {
     res.redirect("/urls");
     return;
   }
@@ -204,14 +204,13 @@ app.post("/register", (req, res) => {
     password: hashedPassword
   };
 
-  loggedIn = true;
   req.session.user_id = userID; // create user_id cookie based on user ID
   res.redirect("/urls");
 });
 
 // renders login page if not logged in
 app.get("/login", (req, res) => {
-  if (loggedIn) {
+  if (isLoggedIn(req)) {
     res.redirect("/urls");
     return;
   }
@@ -249,13 +248,11 @@ app.post("/login", (req, res) => {
     return;
   }
 
-  loggedIn = true;
   res.redirect("/urls");
 });
 
 // Logout, removes user_id cookie
 app.post("/logout", (req, res) => {
-  loggedIn = false;
   req.session.user_id = null;
   res.redirect("/login");
 });
