@@ -20,30 +20,8 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-const urlDatabase = {
-  "b2xVn2": {
-    longURL: "http://www.lighthouselabs.ca",
-    userID: "aJ48lW"
-  },
-  "9sm5xK": {
-    longURL: "http://www.google.com",
-    userID: "aJ48lW"
-  }
-};
-
-const users = {
-  aJ48lW: {
-    id: "aJ48lW",
-    email: "user@example.com",
-    password: "1234",
-  },
-  g6Ymc8: {
-    id: "g6Ymc8",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
-  },
-};
-
+const urlDatabase = {};
+const users = {};
 let loggedIn = false; // toggle logged in state
 
 app.get("/", (req, res) => {
