@@ -227,19 +227,20 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = getUserByEmail(email, users);
-  
+
   if (!formValidation(email, password)) { // email and password fields must have correct content
     res.status(400).send("Please fill out all fields");
     return;
   }
 
-  const passwordIsValid = bcrypt.compareSync(password, user.password); // returns true if valid
+  const user = getUserByEmail(email, users);
 
   if (!getUserByEmail(email, users)) { // prevents multiple registrations under an email
     res.status(403).send("There are no accounts under this email, please register");
     return;
   }
+
+  const passwordIsValid = bcrypt.compareSync(password, user.password); // returns true if valid
 
   if (!passwordIsValid) { // checks for correct password
     res.status(403).send("Incorrect password");
@@ -254,6 +255,6 @@ app.post("/login", (req, res) => {
 
 // Logout, removes user_id cookie
 app.post("/logout", (req, res) => {
-  req.session.user_id = null;
+  req.session = null;
   res.redirect("/login");
 });
